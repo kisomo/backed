@@ -14,13 +14,14 @@ from random import random, randint
 t = datetime.datetime.time(datetime.datetime.now())
 
 data = pd.read_csv("housing.csv", delim_whitespace = True, header = None)
-data1 = pd.read_csv('~/Tensorflow/DAQ/NDX2.csv')
-#data2 = pd.read_csv('~/Tensorflow/DAQ/SPX.csv')
-#data3 = pd.read_csv('~/Tensorflow/DAQ/RUT.csv')
+data1 = pd.read_csv('ENDEX2.csv')
+#data2 = pd.read_csv('ESIVI.csv')
+#data3 = pd.read_csv('ALUT.csv')
 print(data1.head())
 print(data1.tail)
 data1 = np.array(data1)
 
+'''
 
 forward = 10
 future = 5
@@ -75,6 +76,7 @@ nb_epochs = 2
 
 '''
 
+'''
 ## mlp
 def mlp_model(train, batch_size, nb_epoch, neurons):
     X,y = train[:,:-1], train[:,-1]
@@ -108,7 +110,7 @@ def simple_model(train, batch_size, nb_epoch, neurons):
 		model.reset_states()
 	return model
 
-'''
+
 
 ##lstm
 def lstm_model(train, batch_size, nb_epoch, neurons):
@@ -126,7 +128,7 @@ def lstm_model(train, batch_size, nb_epoch, neurons):
 	return model
 
 
-'''
+
 
 ##gru
 def gru_model(train, batch_size, nb_epoch, neurons):
@@ -197,6 +199,8 @@ def bi_gru_model(train, batch_size, nb_epoch, neurons):
 '''
 
 
+'''
+
 def forecast_models(model, batch_size, row):
     X = row #[0:-1]
     X = X.reshape(1,1,len(X))
@@ -239,6 +243,7 @@ def simulated_uni(model, train, batch_size, nb_epochs, neurons):
     return np.mean(predictions1, axis = 1)
 
 
+'''
 ##pred
 
 '''
@@ -267,6 +272,9 @@ for k in range(1,len(X_test)):
     X_test[k,:,-1] = y_simple[k]
 
 '''
+
+'''
+
 #t = datetime.datetime.time(datetime.datetime.now())
 print(datetime.datetime.time(datetime.datetime.now()))
 print(y_test)
@@ -284,3 +292,5 @@ print(y_test)
 
 print(t)
 print(datetime.datetime.time(datetime.datetime.now()))
+
+'''
