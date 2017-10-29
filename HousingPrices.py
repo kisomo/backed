@@ -22,13 +22,13 @@ print(data1.tail)
 data1 = np.array(data1)
 print(data1.shape)
 
-forward = 10
+
+forward = 5
 future = 5
-lag = 15
+lag = 7
 
 X = np.array(data1)
-X = X[len(X)-250:,1]
-#X = X[:,1]
+X = X[len(X)-150:,1]
 
 
 def to_supervised(data, lag):
@@ -42,19 +42,25 @@ def to_supervised(data, lag):
 df = to_supervised(X,lag)
 df = np.array(df)
 n1 = len(df)- forward
-#print(df[:10,:])
+print(df[:10,:])
 print(df[(len(df)-10):,:])
 print(df.shape)
 
 
 train, test = df[:n1,:], df[n1:,:]
+#big_M = np.max(train[:,-1])
+#small_M = np.min(train[:,-1])
+#train = (train - small_M )/(big_M - small_M)
+
 print(train.shape)
 print(test.shape)
 
 print(len(df),n1)
+print(train[0:5,:])
+
 
 X_train ,y_train = train[:,:-1], train[:,-1]
-X_test = np.zeros((forward+future,lag), dtype = float)
+X_test = np.ones((forward+future,lag), dtype = float)
 y_test = test[:,-1]
 testX = test[:,:-1]
 
@@ -72,10 +78,11 @@ X_test[0,:] = df[(n1-1),1:]
 print(X_test)
 
 batch_size = 1
-neurons = 2
-bi_neurons = 2
-repeats = 2
-nb_epochs = 2
+mlp_neurons = 500
+neurons = 50
+bi_neurons = 10
+repeats = 20
+nb_epochs = 200
 
 
 
@@ -129,7 +136,7 @@ def lstm_model(train, batch_size, nb_epoch, neurons):
         model.add(LSTM(neurons, return_sequences = True, init = 'normal', activation = 'relu'))
         model.add(Dropout(0.2))
         model.add(LSTM(neurons, return_sequences = False, init = 'normal', activation = 'relu'))
-        model.add(Dense(1, activation = 'linear'))
+        model.add(Dense(1, activation = 'relu'))
 	model.compile(loss='mse', optimizer='adam', metrics = ['acc'])
 	for i in range(nb_epoch):
 		model.fit(X, y, epochs=1, batch_size=batch_size, verbose=2, shuffle=False)
@@ -229,15 +236,15 @@ def forecast_uni(model, batch_size, row):
 
 
 
-#mlp_RNN = mlp_model(train, batch_size, nb_epochs, neurons)
+#mlp_RNN = mlp_model(train, batch_size, nb_epochs, mlp_neurons)
 #simple_RNN = simple_model(train, batch_size, nb_epochs, neurons)
-#lstm_RNN = lstm_model(train, batch_size, nb_epochs, neurons)
+lstm_RNN = lstm_model(train, batch_size, nb_epochs, neurons)
 #gru_RNN = gru_model(train, batch_size, nb_epochs, neurons)
 #bi_simple = bi_simple_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
 
 #bi_lstm = bi_lstm_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
 
-bi_gru = bi_gru_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
+#bi_gru = bi_gru_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
 
 
 
@@ -293,11 +300,11 @@ def simulated_uni(model, train, batch_size, nb_epochs, neurons):
 
 print(y_test)
 print("===================== mlp =============================")
-#print(simulated_mlp(mlp_RNN, train, batch_size, nb_epochs, neurons))
+#print(simulated_mlp(mlp_RNN, train, batch_size, nb_epochs, mlp_neurons))
 print("====================simple ============================")
 #print(simulated_uni(simple_RNN, train,batch_size, nb_epochs, neurons))
 print("=======================lstm =============================")
-#print(simulated_uni(lstm_RNN, train, batch_size, nb_epochs, neurons))
+print(simulated_uni(lstm_RNN, train, batch_size, nb_epochs, neurons))
 print("========================= gru ===============================")
 #print(simulated_uni(gru_RNN, train, batch_size, nb_epochs, neurons))
 
@@ -308,7 +315,7 @@ print("==================== bi lstm ===============================")
 #print(simulated_uni(bi_lstm, train, batch_size, nb_epochs, bi_neurons))
 
 print("==================== bi gru =================================")
-print(simulated_uni(bi_gru, train, batch_size, nb_epochs, bi_neurons))
+#print(simulated_uni(bi_gru, train, batch_size, nb_epochs, bi_neurons))
 
 
 print("===================== true ================================")
@@ -318,3 +325,63 @@ print(t)
 print(datetime.datetime.time(datetime.datetime.now()))
 
 
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'''
+from keras.datasets import cifar10
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Dropout
+from keras.layers import Flatten
+from keras.constraints import maxnorm
+from keras.optimizers import SGD
+from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import MaxPooling2D
+from keras.utils import np_utils
+from keras import backend as K
+
+K.set_image_dim_ordering('th')
+
+seed = 7
+np.random.seed(seed)
+
+
+
+# Create the model
+model = Sequential()
+model.add(Conv2D(32, (3, 3), input_shape=(1, X_train.shape[1], X_train.shape[2]), activation='relu', padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(32, (3, 3), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dropout(0.2))
+model.add(Dense(1024, activation='relu', kernel_constraint=maxnorm(3)))
+model.add(Dropout(0.2))
+model.add(Dense(512, activation='relu', kernel_constraint=maxnorm(3)))
+model.add(Dropout(0.2))
+model.add(Dense(1, activation='softmax'))
+# Compile model
+epochs = 25
+lrate = 0.01
+decay = lrate/epochs
+sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
+model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+print(model.summary())
+
+X_train = train[:,0:-1]
+y_train = train[:,-1]
+X_train = X_train.reshape(X_train.shape[0],X_train.shape[1],1)
+
+model.fit(X_train, y_train, validation_data=(testX, y_test), epochs=epochs, batch_size=64)
+# Final evaluation of the model
+scores = model.evaluate(testX, y_test, verbose=0)
+print("Accuracy: %.2f%%" % (scores[1]*100))
+
+'''
