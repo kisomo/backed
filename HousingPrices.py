@@ -78,11 +78,11 @@ X_test[0,:] = df[(n1-1),1:]
 print(X_test)
 
 batch_size = 1
-mlp_neurons = 500
-neurons = 50
+mlp_neurons = 10
+neurons = 10
 bi_neurons = 10
-repeats = 20
-nb_epochs = 200
+repeats = 5
+nb_epochs = 10
 
 
 

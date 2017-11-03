@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 from __future__ import print_function, division
 
 import sys
@@ -21,7 +23,7 @@ import tensorflow.contrib.rnn as rnn
 from tensorflow.contrib.learn.python.learn import learn_runner
 
 random.seed(111)
-'''
+
 rng = pd.date_range(start = '2000', periods = 209, freq = 'd')
 ts = pd.Series(np.random.uniform(-10,10, size = len(rng)), rng).cumsum()
 #ts.plot(c = 'b', title = 'Example time series')
@@ -123,9 +125,9 @@ with tf.Session() as sess:
 print("-=====================================================")
 print(Y_test)
 
+
+
 '''
-
-
 print("============ Application ===============================")
 #Application
 d1 = pd.read_csv('ENDEX2.csv')
@@ -217,7 +219,7 @@ y_test = y_test.reshape(len(y_test),1)
 print(y_test)
 y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 #print(y1_pred - y_test)
-
+'''
 
 
 '''
