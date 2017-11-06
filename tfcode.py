@@ -24,6 +24,7 @@ from tensorflow.contrib.learn.python.learn import learn_runner
 
 random.seed(111)
 
+
 rng = pd.date_range(start = '2000', periods = 209, freq = 'd')
 ts = pd.Series(np.random.uniform(-10,10, size = len(rng)), rng).cumsum()
 #ts.plot(c = 'b', title = 'Example time series')
@@ -110,7 +111,7 @@ training_op = optimizer.minimize(loss)
 init = tf.global_variables_initializer()
 
 
-epochs = 500
+epochs = 200
 
 with tf.Session() as sess:
      init.run()
@@ -127,7 +128,7 @@ print(Y_test)
 
 
 
-'''
+
 print("============ Application ===============================")
 #Application
 d1 = pd.read_csv('ENDEX2.csv')
@@ -200,7 +201,7 @@ training_op = optimizer.minimize(loss)
 
 init = tf.global_variables_initializer()
 
-epochs = 300
+epochs = 200
 y2_pred = list()
 
 with tf.Session() as sess:
@@ -219,10 +220,10 @@ y_test = y_test.reshape(len(y_test),1)
 print(y_test)
 y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 #print(y1_pred - y_test)
-'''
 
 
-'''
+
+
 ################# PART 1 ###########################################
 print("================== PART 1 ===================================")
 
@@ -249,6 +250,10 @@ def generateData():
 X,y = generateData()
 print(X.shape)
 print(y.shape)
+print(X[:,0:5])
+print(np.arange(2))
+print(range(2))
+
 
 batchX_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_length])
 batchY_placeholder = tf.placeholder(tf.int32, [batch_size, truncated_backprop_length])
@@ -262,8 +267,9 @@ W2 = tf.Variable(np.random.rand(state_size, num_classes),dtype=tf.float32)
 b2 = tf.Variable(np.zeros((1,num_classes)), dtype=tf.float32)
 
 # Unpack columns
-inputs_series = tf.unpack(batchX_placeholder, axis=1)
-labels_series = tf.unpack(batchY_placeholder, axis=1)
+inputs_series = tf.unstack(batchX_placeholder, axis=1)
+labels_series = tf.unstack(batchY_placeholder, axis=1)
+
 
 # Forward pass
 current_state = init_state
@@ -277,6 +283,7 @@ for current_input in inputs_series:
     current_state = next_state
 
 
+
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
 
@@ -286,6 +293,9 @@ total_loss = tf.reduce_mean(losses)
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
 
 
+
+
+'''
 def plot(loss_list, predictions_series, batchX, batchY):
     plt.subplot(2, 3, 1)
     plt.cla()
@@ -306,11 +316,13 @@ def plot(loss_list, predictions_series, batchX, batchY):
     plt.draw()
     plt.pause(0.0001)
 
+'''
+
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
-    plt.ion()
-    plt.figure()
-    plt.show()
+    #plt.ion()
+    #plt.figure()
+    #plt.show()
     loss_list = []
 
     for epoch_idx in range(num_epochs):
@@ -338,15 +350,15 @@ with tf.Session() as sess:
 
             if batch_idx%100 == 0:
                 print("Step",batch_idx, "Loss", _total_loss)
-                plot(loss_list, _predictions_series, batchX, batchY)
+                #plot(loss_list, _predictions_series, batchX, batchY)
 
-plt.ioff()
-plt.show()
+#plt.ioff()
+#plt.show()
 
 ##################### PART2 ########################################
 print("================= PART 2 ===================================")
 
-'''
+
 
 
 
