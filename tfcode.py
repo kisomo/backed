@@ -173,7 +173,7 @@ print(X_test.shape)
 tf.reset_default_graph()
 
 inputs = lag
-hidden = 1000
+hidden = 100
 output = 1
 
 x = tf.placeholder(tf.float32, [None, batch_size,lag])
@@ -227,7 +227,7 @@ y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 ################# PART 1 ###########################################
 print("================== PART 1 ===================================")
 
-num_epochs = 100
+num_epochs = 10
 total_series_length = 50000
 truncated_backprop_length = 15
 state_size = 4
@@ -276,22 +276,22 @@ current_state = init_state
 states_series = []
 for current_input in inputs_series:
     current_input = tf.reshape(current_input, [batch_size, 1])
-    input_and_state_concatenated = tf.concat(1, [current_input, current_state])  # Increasing number of columns
+    input_and_state_concatenated = tf.concat([current_input, current_state],1)  # Increasing number of columns
 
     next_state = tf.tanh(tf.matmul(input_and_state_concatenated, W) + b)  # Broadcasted addition
     states_series.append(next_state)
     current_state = next_state
 
 
-
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
 
-losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits, labels) for logits, labels in zip(logits_series,labels_series)]
+
+losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
+
 total_loss = tf.reduce_mean(losses)
 
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
-
 
 
 
@@ -317,6 +317,7 @@ def plot(loss_list, predictions_series, batchX, batchY):
     plt.pause(0.0001)
 
 '''
+
 
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
