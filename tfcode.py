@@ -24,7 +24,7 @@ from tensorflow.contrib.learn.python.learn import learn_runner
 
 random.seed(111)
 
-
+'''
 rng = pd.date_range(start = '2000', periods = 209, freq = 'd')
 ts = pd.Series(np.random.uniform(-10,10, size = len(rng)), rng).cumsum()
 #ts.plot(c = 'b', title = 'Example time series')
@@ -222,12 +222,12 @@ y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 #print(y1_pred - y_test)
 
 
-
+'''
 
 ################# PART 1 ###########################################
 print("================== PART 1 ===================================")
 
-num_epochs = 10
+num_epochs = 3
 total_series_length = 50000
 truncated_backprop_length = 15
 state_size = 4
@@ -270,6 +270,10 @@ b2 = tf.Variable(np.zeros((1,num_classes)), dtype=tf.float32)
 inputs_series = tf.unstack(batchX_placeholder, axis=1)
 labels_series = tf.unstack(batchY_placeholder, axis=1)
 
+print("====================")
+print(batchX_placeholder.shape)
+print(inputs_series)
+
 
 # Forward pass
 current_state = init_state
@@ -292,7 +296,6 @@ losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=l
 total_loss = tf.reduce_mean(losses)
 
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
-
 
 
 '''
