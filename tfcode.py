@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 from __future__ import print_function, division
 
@@ -9,11 +9,11 @@ import pandas as pd
 import random
 import shutil
 import os
-#import matplotlib
-#import matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.pyplot as plt
 
-#from sklearn import datasets
-#from sklearn.decomposition import PCA
+from sklearn import datasets
+from sklearn.decomposition import PCA
 
 import tensorflow.contrib.learn as tflearn
 import tensorflow.contrib.layers as tflayers
@@ -24,33 +24,36 @@ from tensorflow.contrib.learn.python.learn import learn_runner
 
 random.seed(111)
 
-'''
-rng = pd.date_range(start = '2000', periods = 209, freq = 'd')
+
+rng = pd.date_range(start = '2000', periods = 209, freq = 'm')
 ts = pd.Series(np.random.uniform(-10,10, size = len(rng)), rng).cumsum()
-#ts.plot(c = 'b', title = 'Example time series')
-#plt.show()
-#print(ts.head(10))
-#print(ts.tail(10))
-#print(ts.shape)
+ts.plot(c = 'b', title = 'Example time series')
+plt.show()
+print(ts.head(10))
+print(ts.tail(10))
+print(ts.shape)
 print("============= START =================================")
 TS = np.array(ts)
-#print(TS.shape)
+
+print(TS.shape)
 num_periods = 20
 f_horizon = 3 #1
-#print(len(TS)%num_periods)
+print(len(TS)%num_periods)
 x_data = TS[:(len(TS)-(len(TS)%num_periods))]
-#print(x_data.shape)
+print(x_data.shape)
 x_batches = x_data.reshape(-1,20,1)
-#print(x_batches.shape)
-#y_data = TS[1:(len(TS)-(len(TS)%num_periods)) + f_horizon]
+print(x_batches.shape)
+##y_data = TS[1:(len(TS)-(len(TS)%num_periods)) + f_horizon]
 y_data = TS[f_horizon:(len(TS)-(len(TS)%num_periods))+f_horizon]
-#print(y_data.shape)
+print(y_data.shape)
 y_batches = y_data.reshape(-1,20,1)
-#print(len(x_batches))
-#print(y_batches.shape)
-#print(x_batches.shape)
+print(len(x_batches))
+print(y_batches.shape)
+print(x_batches.shape)
 #print(x_batches[0:2])
-#print("==============")
+print("==============")
+
+'''
 #print(y_batches[0:1])
 #print(y_batches.shape)
 df = TS[-(num_periods + f_horizon):]
@@ -222,7 +225,8 @@ y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 #print(y1_pred - y_test)
 
 
-'''
+
+
 
 ################# PART 1 ###########################################
 print("================== PART 1 ===================================")
@@ -298,7 +302,6 @@ total_loss = tf.reduce_mean(losses)
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
 
 
-'''
 def plot(loss_list, predictions_series, batchX, batchY):
     plt.subplot(2, 3, 1)
     plt.cla()
@@ -319,14 +322,15 @@ def plot(loss_list, predictions_series, batchX, batchY):
     plt.draw()
     plt.pause(0.0001)
 
-'''
+
+
 
 
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
-    #plt.ion()
-    #plt.figure()
-    #plt.show()
+    plt.ion()
+    plt.figure()
+    plt.show()
     loss_list = []
 
     for epoch_idx in range(num_epochs):
@@ -354,15 +358,15 @@ with tf.Session() as sess:
 
             if batch_idx%100 == 0:
                 print("Step",batch_idx, "Loss", _total_loss)
-                #plot(loss_list, _predictions_series, batchX, batchY)
+                plot(loss_list, _predictions_series, batchX, batchY)
 
-#plt.ioff()
-#plt.show()
+plt.ioff()
+plt.show()
 
 ##################### PART2 ########################################
 print("================= PART 2 ===================================")
 
-
+'''
 
 
 

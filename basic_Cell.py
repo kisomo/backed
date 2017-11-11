@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 from __future__ import print_function, division
 
@@ -9,11 +9,12 @@ import pandas as pd
 import random
 import shutil
 import os
+import time
 #import matplotlib
 #import matplotlib.pyplot as plt
 
-#from sklearn import datasets
-#from sklearn.decomposition import PCA
+from sklearn import datasets
+from sklearn.decomposition import PCA
 
 import tensorflow.contrib.learn as tflearn
 import tensorflow.contrib.layers as tflayers
@@ -58,13 +59,15 @@ W2 = tf.Variable(np.random.rand(state_size, num_classes),dtype=tf.float32)
 b2 = tf.Variable(np.zeros((1,num_classes)), dtype=tf.float32)
 
 # Unpack columns
-inputs_series = tf.split(1, truncated_backprop_length, batchX_placeholder)
+inputs_series = tf.split(batchX_placeholder, truncated_backprop_length,1)
 labels_series = tf.unstack(batchY_placeholder, axis=1)
 
-'''
+
 # Forward passes
 cell = tf.nn.rnn_cell.BasicRNNCell(state_size)
-states_series, current_state = tf.nn.rnn(cell, inputs_series, init_state)
+#cell = tf.contrib.rnn.BasicRNNCell(num_units = state_size, activation = tf.nn.relu)
+states_series, current_state = tf.nn.dynamic_rnn(cell, inputs_series, init_state)
+#states_series, current_state = tf.nn.dynamic_rnn(cell, inputs_series, dtype = tf.float32)
 
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
@@ -74,7 +77,7 @@ total_loss = tf.reduce_mean(losses)
 
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
 
-
+'''
 def plot(loss_list, predictions_series, batchX, batchY):
     plt.subplot(2, 3, 1)
     plt.cla()
@@ -138,7 +141,7 @@ plt.show()
 
 
 
-
+'''
 print("============ Application ===============================")
 #Application
 d1 = pd.read_csv('ENDEX2.csv')
@@ -165,3 +168,5 @@ n1 = len(df) - forward
 train, test = df[:n1,:], df[n1:,:]
 X_train, y_train = train[:,:-1], train[:,-1]
 print(X_train.shape)
+
+'''
