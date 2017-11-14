@@ -50,33 +50,32 @@ y_batches = y_data.reshape(-1,20,1)
 print(len(x_batches))
 print(y_batches.shape)
 print(x_batches.shape)
-#print(x_batches[0:2])
+##print(x_batches[0:2])
 print("==============")
 
-'''
-#print(y_batches[0:1])
-#print(y_batches.shape)
+##print(y_batches[0:1])
 df = TS[-(num_periods + f_horizon):]
-#print(df.shape)
+print(df.shape)
 df1 = df[:num_periods]
-#print(df1.shape)
+print(df1.shape)
 df1 = df1.reshape(-1,20,1)
-#print(df1.shape)
+print(df1.shape)
 df2 = TS[-num_periods:]
-#print(df2.shape)
+print(df2.shape)
 df2 = df2.reshape(-1,20,1)
-#print(df2.shape)
+print(df2.shape)
+
 def test_data(series, forecast, num_periods):
-    test_x_setup = TS[-(num_periods + forecast):]
+    test_x_setup = series[-(num_periods + forecast):]
     testX = test_x_setup[:num_periods].reshape(-1,20,1)
-    testY = TS[-(num_periods):].reshape(-1,20,1)
+    testY = series[-(num_periods):].reshape(-1,20,1)
     return testX, testY
 
 X_test, Y_test = test_data(TS,f_horizon,num_periods)
 
-#print(X_test.shape)
-#print(Y_test.shape)
-#print(X_test)
+print(X_test.shape)
+print(Y_test.shape)
+##print(X_test)
 
 tf.reset_default_graph()
 num_periods = 20
@@ -87,10 +86,9 @@ output = 1
 x = tf.placeholder(tf.float32, [None, num_periods, inputs])
 y = tf.placeholder(tf.float32, [None, num_periods, output])
 
-#print(x.shape)
-#print(y.shape)
-#print(x)
-
+print(x.shape)
+print(y.shape)
+print(x)
 
 basic_cell = tf.contrib.rnn.BasicRNNCell(num_units = hidden, activation = tf.nn.relu)
 rnn_output, states = tf.nn.dynamic_rnn(basic_cell, x, dtype = tf.float32)
@@ -113,8 +111,7 @@ training_op = optimizer.minimize(loss)
 
 init = tf.global_variables_initializer()
 
-
-epochs = 200
+epochs = 300
 
 with tf.Session() as sess:
      init.run()
@@ -128,21 +125,19 @@ with tf.Session() as sess:
 
 print("-=====================================================")
 print(Y_test)
-
-
+print(y_pred - Y_test)
 
 
 print("============ Application ===============================")
-#Application
 d1 = pd.read_csv('ENDEX2.csv')
 forward = 5
 future = 5
-lag = 7
-batch_size =  7
+lag = 15
+batch_size =  15
 
 X = np.array(d1)
-X = X[len(X)-250:,1]
-
+X = X[len(X)-500:,1]
+print(X.shape)
 
 def to_supervised(data, lag):
     df = pd.DataFrame(data)
@@ -154,15 +149,18 @@ def to_supervised(data, lag):
 
 df = to_supervised(X, lag)
 df = np.array(df)
+print(df.shape)
 n1 = len(df) - forward
 train, test = df[:n1,:], df[n1:,:]
 X_train, y_train = train[:,:-1], train[:,-1]
 print(X_train.shape)
+
 x_batches = X_train.reshape(-1,batch_size, lag)
 
 y_batches = y_train.reshape(-1, batch_size,1)
 testX, y_test = test[:,:-1], test[:,-1]
 print(testX.shape)
+print(y_test.shape)
 testX2 = np.ones((lag,lag),dtype = float)
 testX2[:future,:]= testX
 testX2 = testX2.reshape(-1,lag,lag)
@@ -225,9 +223,6 @@ y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 #print(y1_pred - y_test)
 
 
-
-
-
 ################# PART 1 ###########################################
 print("================== PART 1 ===================================")
 
@@ -258,7 +253,9 @@ print(X[:,0:5])
 print(np.arange(2))
 print(range(2))
 
+tf.reset_default_graph()
 
+'''
 batchX_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_length])
 batchY_placeholder = tf.placeholder(tf.int32, [batch_size, truncated_backprop_length])
 
