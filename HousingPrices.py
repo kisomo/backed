@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 import tensorflow as tf
 import numpy as np
 import math
@@ -81,9 +83,8 @@ batch_size = 1
 mlp_neurons = 10
 neurons = 10
 bi_neurons = 10
-repeats = 5
+repeats = 10
 nb_epochs = 10
-
 
 
 ## mlp
@@ -236,15 +237,15 @@ def forecast_uni(model, batch_size, row):
 
 
 
-#mlp_RNN = mlp_model(train, batch_size, nb_epochs, mlp_neurons)
-#simple_RNN = simple_model(train, batch_size, nb_epochs, neurons)
+mlp_RNN = mlp_model(train, batch_size, nb_epochs, mlp_neurons)
+simple_RNN = simple_model(train, batch_size, nb_epochs, neurons)
 lstm_RNN = lstm_model(train, batch_size, nb_epochs, neurons)
-#gru_RNN = gru_model(train, batch_size, nb_epochs, neurons)
-#bi_simple = bi_simple_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
+gru_RNN = gru_model(train, batch_size, nb_epochs, neurons)
+bi_simple = bi_simple_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
 
-#bi_lstm = bi_lstm_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
+bi_lstm = bi_lstm_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
 
-#bi_gru = bi_gru_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
+bi_gru = bi_gru_model(train, batch_size, nb_epochs, bi_neurons, 'ave')
 
 
 
@@ -299,26 +300,26 @@ def simulated_uni(model, train, batch_size, nb_epochs, neurons):
 ##pred
 
 print(y_test)
-print("===================== mlp =============================")
-#print(simulated_mlp(mlp_RNN, train, batch_size, nb_epochs, mlp_neurons))
-print("====================simple ============================")
-#print(simulated_uni(simple_RNN, train,batch_size, nb_epochs, neurons))
-print("=======================lstm =============================")
+print("===================== mlp ==================================")
+print(simulated_mlp(mlp_RNN, train, batch_size, nb_epochs, mlp_neurons))
+print("====================simple ==================================")
+print(simulated_uni(simple_RNN, train,batch_size, nb_epochs, neurons))
+print("=======================lstm =================================")
 print(simulated_uni(lstm_RNN, train, batch_size, nb_epochs, neurons))
 print("========================= gru ===============================")
-#print(simulated_uni(gru_RNN, train, batch_size, nb_epochs, neurons))
+print(simulated_uni(gru_RNN, train, batch_size, nb_epochs, neurons))
 
-print("===================== bi simple ============================")
-#print(simulated_uni(bi_simple, train, batch_size, nb_epochs, bi_neurons))
+print("===================== bi simple =============================")
+print(simulated_uni(bi_simple, train, batch_size, nb_epochs, bi_neurons))
 
-print("==================== bi lstm ===============================")
-#print(simulated_uni(bi_lstm, train, batch_size, nb_epochs, bi_neurons))
+print("==================== bi lstm ================================")
+print(simulated_uni(bi_lstm, train, batch_size, nb_epochs, bi_neurons))
 
 print("==================== bi gru =================================")
-#print(simulated_uni(bi_gru, train, batch_size, nb_epochs, bi_neurons))
+print(simulated_uni(bi_gru, train, batch_size, nb_epochs, bi_neurons))
 
 
-print("===================== true ================================")
+print("===================== true ==================================")
 print(y_test)
 
 print(t)

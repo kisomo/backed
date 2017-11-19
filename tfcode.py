@@ -358,16 +358,47 @@ with tf.Session() as sess:
 
 plt.ioff()
 plt.show()
-'''
 
+'''
 
 ##################### PART2 ########################################
 print("================= PART 2 - Application ===================================")
 d1 = pd.read_csv('ENDEX2.csv')
+
+num_epochs = 5
+total_series_length = 500
+truncated_backprop_length = 10
+state_size = 4
+num_classes = 1
+echo_step = 5
+batch_size = 5
+num_batches = total_series_length//batch_size//truncated_backprop_length
+
+future = 5
+X = np.array(d1)
+X = X[len(X)-505:,1]
+print(X.shape)
+X1 = np.array((1,len(X)-echo_step), dtype = float)
+X1 = X[:(len(X)-echo_step)]
+print(X1.shape)
+X2 = np.array((1,len(X)-echo_step), dtype = float)
+X2 = X[echo_step:]
+print(X2.shape)
+X = X1
+y = X2
+
+x = X.reshape((batch_size, -1))  # The first index changing slowest, subseries as rows
+y = y.reshape((batch_size, -1))
+
+print(x.shape)
+print(y.shape)
+print(num_batches)
+
+'''
 forward = 5
 future = 5
 lag = 15
-batch_size = 5 #15
+batch_size = forward #15
 
 inputs = lag
 hidden = 100
@@ -378,7 +409,7 @@ truncated_backprop_length = lag
 state_size = hidden
 num_classes = output
 
-num_batches = 96 
+num_batches = 97
 
 
 X = np.array(d1)
@@ -398,16 +429,20 @@ df = np.array(df)
 print(df[0:10,:])
 print(df[len(df)-10:len(df),:])
 print(df.shape)
+
 n1 = len(df) - forward
 print(n1)
+
 train, test = df[:n1,:], df[n1:,:]
 X_train, y_train = train[:,:-1], train[:,-1]
 print(X_train.shape)
 print(y_train.shape)
+
 x_batches = X_train.reshape(-1,batch_size, lag)
 print(x_batches.shape)
 y_batches = y_train.reshape(-1, batch_size,1)
 print(y_batches.shape)
+
 testX, y_test = test[:,:-1], test[:,-1]
 testX_batches = testX.reshape(-1,batch_size,lag)
 y_test_batches = y_test.reshape(-1,batch_size,1)
@@ -416,17 +451,20 @@ print(y_test.shape)
 print(testX_batches.shape)
 print(y_test_batches.shape)
 
-testX2 = np.ones((lag,lag),dtype = float)
-print(testX2.shape)
-testX2[:future,:]= testX
-testX2 = testX2.reshape(-1,batch_size,lag)
-print(testX2.shape)
+##testX2 = np.ones((lag,lag),dtype = float)
+##print(testX2.shape)
+##testX2[:forward,:]= testX
+##testX2_batches = testX2.reshape(-1,batch_size,lag)
+##print(testX2_batches.shape)
 
 X_test = np.ones((forward+future, lag),dtype = float)
 print(X_test.shape)
 X_test[0,:] = df[(n1-1),1:]
-X_test = X_test.reshape(-1, batch_size,lag)
-print(X_test.shape)
+X_test_batches = X_test.reshape(-1, batch_size,lag)
+print(X_test_batches.shape)
+
+'''
+
 
 tf.reset_default_graph()
 
@@ -444,17 +482,25 @@ W2 = tf.Variable(np.random.rand(state_size, num_classes),dtype=tf.float32)
 b2 = tf.Variable(np.zeros((1,num_classes)), dtype=tf.float32)
 
 # Unpack columns
-inputs_series = tf.unstack(batchX_placeholder, axis=1)
-labels_series = tf.unstack(batchY_placeholder, axis=1)
+inputs_series = tf.unstack(batchX_placeholder, axis=1) # axis 1
+labels_series = tf.unstack(batchY_placeholder, axis=1) # axis 1
 
 print("====================")
 print(batchX_placeholder.shape)
+print(batchY_placeholder.shape)
+##print(inputs_series.shape)
+#print(labels_series.shape)
+print(init_state.shape)
 print(inputs_series)
+print("===============")
+print(inputs_series[0])
 
 # Forward pass
 current_state = init_state
 states_series = []
+
 for current_input in inputs_series:
+    current_input = inputs_series[0]
     current_input = tf.reshape(current_input, [batch_size, 1])
     input_and_state_concatenated = tf.concat([current_input, current_state],1)  # Increasing number of columns
 
@@ -462,16 +508,53 @@ for current_input in inputs_series:
     states_series.append(next_state)
     current_state = next_state
 
+'''
+current_input = inputs_series[0]
+print(current_input)
+current_input = tf.reshape(current_input, [batch_size, 1])
+input_and_state_concatenated = tf.concat([current_input, current_state],1)  # Increasing number of columns
+next_state = tf.tanh(tf.matmul(input_and_state_concatenated, W) + b)  # Broadcasted addition
+states_series.append(next_state)
+current_state = next_state
 
+print(current_input)
+print(input_and_state_concatenated)
+print(next_state)
+print(states_series)
+print(current_state)
+
+print("++++++++++++++++++++++++++++++++++")
+current_input = inputs_series[1]
+print(current_input)
+current_input = tf.reshape(current_input, [batch_size, 1])
+input_and_state_concatenated = tf.concat([current_input, current_state],1)  # Increasing number of columns
+
+next_state = tf.tanh(tf.matmul(input_and_state_concatenated, W) + b)  # Broadcasted addition
+states_series.append(next_state)
+current_state = next_state
+
+print(current_input)
+print(input_and_state_concatenated)
+print(next_state)
+print(states_series)
+print(current_state)
+'''
+
+'''
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
+print(logits_series)
+print("++++++++++++++++++++")
 predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
-
+print(predictions_series)
+print("++++++++++++++++++++")
 losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
-
+print(losses)
+print("++++++++++++++++++++")
 total_loss = tf.reduce_mean(losses)
+print(total_loss)
 
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
-
+print(train_step)
 
 def plot(loss_list, predictions_series, batchX, batchY):
     plt.subplot(2, 3, 1)
@@ -493,6 +576,9 @@ def plot(loss_list, predictions_series, batchX, batchY):
     plt.draw()
     plt.pause(0.0001)
 
+x = x
+y = y
+_current_state = np.zeros((batch_size, state_size))
 
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
@@ -503,10 +589,11 @@ with tf.Session() as sess:
 
     for epoch_idx in range(num_epochs):
         ##x,y = generateData()
-        x = x_batches
-        y = y_batches
-        _current_state = np.zeros((batch_size, state_size))
-        _current_state = _current_state.reshape(-1,batch_size, state_size)
+        #x = x
+        #y = y
+        #_current_state = np.zeros((batch_size, state_size))
+        #_current_state = tf.zeros(tf.float32, [batch_size, state_size])
+        #_cur#rent_state = _current_state.reshape(-1,batch_size, state_size)
         #_current_state = tf.Variable((np.zeros(-1, batch_size,state_size)), dtype=tf.float32)
         
         print("New data, epoch", epoch_idx)
@@ -535,6 +622,5 @@ with tf.Session() as sess:
 plt.ioff()
 plt.show()
 
-
-
+'''
 
