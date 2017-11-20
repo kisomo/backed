@@ -373,11 +373,13 @@ num_classes = 1
 echo_step = 5
 batch_size = 5
 num_batches = total_series_length//batch_size//truncated_backprop_length
+print(num_batches)
 
 future = 5
 X = np.array(d1)
 X = X[len(X)-505:,1]
 print(X.shape)
+
 X1 = np.array((1,len(X)-echo_step), dtype = float)
 X1 = X[:(len(X)-echo_step)]
 print(X1.shape)
@@ -393,6 +395,7 @@ y = y.reshape((batch_size, -1))
 print(x.shape)
 print(y.shape)
 print(num_batches)
+
 
 '''
 forward = 5
@@ -469,8 +472,8 @@ print(X_test_batches.shape)
 tf.reset_default_graph()
 
 batchX_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_length])
-#batchY_placeholder = tf.placeholder(tf.int32, [batch_size, truncated_backprop_length])
-batchY_placeholder = tf.placeholder(tf.int32, [batch_size, num_classes])
+batchY_placeholder = tf.placeholder(tf.int32, [batch_size, truncated_backprop_length])
+#batchY_placeholder = tf.placeholder(tf.int32, [batch_size, num_classes])
 
 init_state = tf.placeholder(tf.float32, [batch_size, state_size])
 
@@ -508,6 +511,7 @@ for current_input in inputs_series:
     states_series.append(next_state)
     current_state = next_state
 
+
 '''
 current_input = inputs_series[0]
 print(current_input)
@@ -540,15 +544,18 @@ print(states_series)
 print(current_state)
 '''
 
-'''
+
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 print(logits_series)
+
 print("++++++++++++++++++++")
 predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
 print(predictions_series)
+
 print("++++++++++++++++++++")
 losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
 print(losses)
+
 print("++++++++++++++++++++")
 total_loss = tf.reduce_mean(losses)
 print(total_loss)
@@ -579,6 +586,7 @@ def plot(loss_list, predictions_series, batchX, batchY):
 x = x
 y = y
 _current_state = np.zeros((batch_size, state_size))
+#_current_state = tf.zeros([batch_size, state_size], tf.float32) 
 
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
@@ -622,5 +630,5 @@ with tf.Session() as sess:
 plt.ioff()
 plt.show()
 
-'''
+
 
