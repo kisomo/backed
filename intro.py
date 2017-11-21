@@ -72,10 +72,11 @@ plt.show()
 
 '''
 
-from sklearn import datasets, linear_model
-'''
+##from sklearn import datasets, linear_model
+
 # Import the needed libraries
-import urllib.request as request  
+#import urllib.request as request  
+from urllib2 import urlopen
 
 # Download dataset
 IRIS_TRAIN_URL = "http://download.tensorflow.org/data/iris_training.csv"  
@@ -92,16 +93,17 @@ Xtest = test.drop("species", axis=1)
 # Encode target values into binary ('one-hot' style) representation
 ytrain = pd.get_dummies(train.species)  
 ytest = pd.get_dummies(test.species)  
+
+
 '''
-
-from sklearn import datasets, linear_model
-
 # Load iris dataset
 iris = datasets.load_iris()
 print(iris.data.shape)
 print(iris.data[0:10,:])
 y = iris.data[:,3]
 X = iris.data[:,0:3]
+
+'''
 # Create and train a tensorflow model of a neural network
 def create_train_model(hidden_nodes, num_iters):
 
@@ -161,15 +163,7 @@ for hidden_nodes in num_hidden_nodes:
 plt.xlabel('Iteration', fontsize=12)  
 plt.ylabel('Loss', fontsize=12)  
 plt.legend(fontsize=12)  
-
-'''
-loss (hidden nodes: 5, iterations: 2000): 31.82  
-loss (hidden nodes: 10, iterations: 2000): 5.90  
-loss (hidden nodes: 20, iterations: 2000): 5.61
-
-<matplotlib.legend.Legend at 0x123b157f0>  
-
-'''
+plt.show()
 
 # Evaluate models on the test set
 X = tf.placeholder(shape=(30, 4), dtype=tf.float64, name='X')  
@@ -195,11 +189,6 @@ for hidden_nodes in num_hidden_nodes:
     accuracy = 100 * sum(correct) / len(correct)
     print('Network architecture 4-%d-3, accuracy: %.2f%%' % (hidden_nodes, accuracy))
 
-'''
-Network architecture 4-5-3, accuracy: 90.00%  
-Network architecture 4-10-3, accuracy: 96.67%  
-Network architecture 4-20-3, accuracy: 96.67%  
-'''
 
 
 
