@@ -72,6 +72,8 @@ plt.show()
 
 '''
 
+from sklearn import datasets, linear_model
+'''
 # Import the needed libraries
 import urllib.request as request  
 
@@ -90,7 +92,16 @@ Xtest = test.drop("species", axis=1)
 # Encode target values into binary ('one-hot' style) representation
 ytrain = pd.get_dummies(train.species)  
 ytest = pd.get_dummies(test.species)  
+'''
 
+from sklearn import datasets, linear_model
+
+# Load iris dataset
+iris = datasets.load_iris()
+print(iris.data.shape)
+print(iris.data[0:10,:])
+y = iris.data[:,3]
+X = iris.data[:,0:3]
 # Create and train a tensorflow model of a neural network
 def create_train_model(hidden_nodes, num_iters):
 
@@ -184,10 +195,11 @@ for hidden_nodes in num_hidden_nodes:
     accuracy = 100 * sum(correct) / len(correct)
     print('Network architecture 4-%d-3, accuracy: %.2f%%' % (hidden_nodes, accuracy))
 
-    Network architecture 4-5-3, accuracy: 90.00%  
+'''
+Network architecture 4-5-3, accuracy: 90.00%  
 Network architecture 4-10-3, accuracy: 96.67%  
 Network architecture 4-20-3, accuracy: 96.67%  
-
+'''
 
 
 
