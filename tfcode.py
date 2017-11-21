@@ -319,9 +319,6 @@ def plot(loss_list, predictions_series, batchX, batchY):
     plt.pause(0.0001)
 
 
-
-
-
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
     plt.ion()
@@ -472,7 +469,7 @@ print(X_test_batches.shape)
 tf.reset_default_graph()
 
 batchX_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_length])
-batchY_placeholder = tf.placeholder(tf.int32, [batch_size, truncated_backprop_length])
+batchY_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_length])
 #batchY_placeholder = tf.placeholder(tf.int32, [batch_size, num_classes])
 
 init_state = tf.placeholder(tf.float32, [batch_size, state_size])
@@ -507,7 +504,8 @@ for current_input in inputs_series:
     current_input = tf.reshape(current_input, [batch_size, 1])
     input_and_state_concatenated = tf.concat([current_input, current_state],1)  # Increasing number of columns
 
-    next_state = tf.tanh(tf.matmul(input_and_state_concatenated, W) + b)  # Broadcasted addition
+    #next_state = tf.tanh(tf.matmul(input_and_state_concatenated, W) + b)  # Broadcasted addition
+    next_state = tf.nn.relu(tf.matmul(input_and_state_concatenated, W) + b)  # Broadcasted addition
     states_series.append(next_state)
     current_state = next_state
 
@@ -548,16 +546,23 @@ print(current_state)
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 print(logits_series)
 
-print("++++++++++++++++++++")
-predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
-print(predictions_series)
 
 print("++++++++++++++++++++")
-losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
+#predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
+predictions_series = [tf.nn.relu(logits) for logits in logits_series]
+print(predictions_series)
+
+deltas = tf.square(np.array(predictions_series) - np.array(labels_series))
+total_loss = tf.reduce_sum(deltas)
+'''
+print("+++++++++compare logits and labels+++++++++++")
+#losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
+losses = [tf.losses.mean_squared_error(logits, labels) for logits, labels in zip(logits_series,labels_series)]
 print(losses)
 
 print("++++++++++++++++++++")
 total_loss = tf.reduce_mean(losses)
+'''
 print(total_loss)
 
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
