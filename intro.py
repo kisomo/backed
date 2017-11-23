@@ -25,6 +25,7 @@ from tensorflow.contrib.learn.python.learn import learn_runner
 
 random.seed(111)
 
+'''
 def get_times(maximum_time):
 
     device_times = { "/cpu:0":[], "/cpu:0":[] }
@@ -63,7 +64,7 @@ print("======================================================")
 print(gpu_times)
 print(cpu_times)
 
-'''
+
 plt.plot(matrix_sizes[:len(gpu_times)], gpu_times, 'o-')
 plt.plot(matrix_sizes[:len(cpu_times)], cpu_times, 'o-')
 plt.ylabel('Time')
@@ -72,6 +73,7 @@ plt.show()
 
 '''
 
+print("++++++++++++++++++++ Example +++++++++++++++++++++++++++++++++++=")
 ##from sklearn import datasets, linear_model
 
 # Import the needed libraries
@@ -89,21 +91,15 @@ test = pd.read_csv(IRIS_TEST_URL, names=names, skiprows=1)
 # Train and test input data
 Xtrain = train.drop("species", axis=1)  
 Xtest = test.drop("species", axis=1)
-
+print(Xtrain.shape)
+print(Xtest.shape)
 # Encode target values into binary ('one-hot' style) representation
 ytrain = pd.get_dummies(train.species)  
 ytest = pd.get_dummies(test.species)  
+print(ytrain.shape)
+print(ytest.shape)
 
 
-'''
-# Load iris dataset
-iris = datasets.load_iris()
-print(iris.data.shape)
-print(iris.data[0:10,:])
-y = iris.data[:,3]
-X = iris.data[:,0:3]
-
-'''
 # Create and train a tensorflow model of a neural network
 def create_train_model(hidden_nodes, num_iters):
 
@@ -148,6 +144,7 @@ def create_train_model(hidden_nodes, num_iters):
 
     # Run the training for 3 different network architectures: (4-5-3) (4-10-3) (4-20-3)
 
+
 # Plot the loss function over iterations
 num_hidden_nodes = [5, 10, 20]  
 loss_plot = {5: [], 10: [], 20: []}  
@@ -164,6 +161,7 @@ plt.xlabel('Iteration', fontsize=12)
 plt.ylabel('Loss', fontsize=12)  
 plt.legend(fontsize=12)  
 plt.show()
+
 
 # Evaluate models on the test set
 X = tf.placeholder(shape=(30, 4), dtype=tf.float64, name='X')  
