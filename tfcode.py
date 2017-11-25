@@ -362,7 +362,7 @@ plt.show()
 print("================= PART 2 - Application ===================================")
 d1 = pd.read_csv('ENDEX2.csv')
 
-num_epochs = 5
+num_epochs = 10
 total_series_length = 500
 truncated_backprop_length = 10
 state_size = 4
@@ -380,6 +380,7 @@ print(X.shape)
 X1 = np.array((1,len(X)-echo_step), dtype = float)
 X1 = X[:(len(X)-echo_step)]
 print(X1.shape)
+
 X2 = np.array((1,len(X)-echo_step), dtype = float)
 X2 = X[echo_step:]
 print(X2.shape)
@@ -393,79 +394,6 @@ print(x.shape)
 print(y.shape)
 print(num_batches)
 
-
-'''
-forward = 5
-future = 5
-lag = 15
-batch_size = forward #15
-
-inputs = lag
-hidden = 100
-output = 1
-
-num_epochs = 10
-truncated_backprop_length = lag
-state_size = hidden
-num_classes = output
-
-num_batches = 97
-
-
-X = np.array(d1)
-X = X[len(X)-500:,1]
-print(X.shape)
-
-def to_supervised(data, lag):
-    df = pd.DataFrame(data)
-    columns = [df.shift(lag + 1 -i) for i in range(1, lag+1)]
-    columns.append(df)
-    df = pd.concat(columns, axis =1)
-    df.dropna(inplace =  True)
-    return df
-
-df = to_supervised(X, lag)
-df = np.array(df)
-print(df[0:10,:])
-print(df[len(df)-10:len(df),:])
-print(df.shape)
-
-n1 = len(df) - forward
-print(n1)
-
-train, test = df[:n1,:], df[n1:,:]
-X_train, y_train = train[:,:-1], train[:,-1]
-print(X_train.shape)
-print(y_train.shape)
-
-x_batches = X_train.reshape(-1,batch_size, lag)
-print(x_batches.shape)
-y_batches = y_train.reshape(-1, batch_size,1)
-print(y_batches.shape)
-
-testX, y_test = test[:,:-1], test[:,-1]
-testX_batches = testX.reshape(-1,batch_size,lag)
-y_test_batches = y_test.reshape(-1,batch_size,1)
-print(testX.shape)
-print(y_test.shape)
-print(testX_batches.shape)
-print(y_test_batches.shape)
-
-##testX2 = np.ones((lag,lag),dtype = float)
-##print(testX2.shape)
-##testX2[:forward,:]= testX
-##testX2_batches = testX2.reshape(-1,batch_size,lag)
-##print(testX2_batches.shape)
-
-X_test = np.ones((forward+future, lag),dtype = float)
-print(X_test.shape)
-X_test[0,:] = df[(n1-1),1:]
-X_test_batches = X_test.reshape(-1, batch_size,lag)
-print(X_test_batches.shape)
-
-'''
-
-
 tf.reset_default_graph()
 
 batchX_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_length])
@@ -475,7 +403,6 @@ batchY_placeholder = tf.placeholder(tf.float32, [batch_size, truncated_backprop_
 init_state = tf.placeholder(tf.float32, [batch_size, state_size])
 
 W = tf.Variable(np.random.rand(state_size+1, state_size), dtype=tf.float32)
-
 b = tf.Variable(np.zeros((1,state_size)), dtype=tf.float32)
 
 W2 = tf.Variable(np.random.rand(state_size, num_classes),dtype=tf.float32)
@@ -511,6 +438,7 @@ for current_input in inputs_series:
 
 
 '''
+print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 current_input = inputs_series[0]
 print(current_input)
 current_input = tf.reshape(current_input, [batch_size, 1])
@@ -525,7 +453,8 @@ print(next_state)
 print(states_series)
 print(current_state)
 
-print("++++++++++++++++++++++++++++++++++")
+
+print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 current_input = inputs_series[1]
 print(current_input)
 current_input = tf.reshape(current_input, [batch_size, 1])
@@ -546,27 +475,27 @@ print(current_state)
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 print(logits_series)
 
-
 print("++++++++++++++++++++")
 #predictions_series = [tf.nn.softmax(logits) for logits in logits_series]
 predictions_series = [tf.nn.relu(logits) for logits in logits_series]
 print(predictions_series)
 
-deltas = tf.square(np.array(predictions_series) - np.array(labels_series))
+deltas = [tf.square(logits - labels) for logits, labels in zip(logits_series,labels_series) ] 
 total_loss = tf.reduce_sum(deltas)
-'''
-print("+++++++++compare logits and labels+++++++++++")
-#losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
-losses = [tf.losses.mean_squared_error(logits, labels) for logits, labels in zip(logits_series,labels_series)]
-print(losses)
 
-print("++++++++++++++++++++")
-total_loss = tf.reduce_mean(losses)
-'''
+##print("+++++++++compare logits and labels+++++++++++")
+##losses = [tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels) for logits, labels in zip(logits_series,labels_series)]
+##losses = [tf.losses.mean_squared_error(logits, labels) for logits, labels in zip(logits_series,labels_series)]
+##print(losses)
+
+##print("++++++++++++++++++++")
+##total_loss = tf.reduce_mean(losses)
+
 print(total_loss)
 
 train_step = tf.train.AdagradOptimizer(0.3).minimize(total_loss)
 print(train_step)
+
 
 def plot(loss_list, predictions_series, batchX, batchY):
     plt.subplot(2, 3, 1)
@@ -631,9 +560,10 @@ with tf.Session() as sess:
             if batch_idx%100 == 0:
                 print("Step",batch_idx, "Loss", _total_loss)
                 plot(loss_list, _predictions_series, batchX, batchY)
+    y1_pred = sess.run(predictions_series, feed_dict = {x:x})
 
 plt.ioff()
 plt.show()
-
+print(y1_pred)
 
 

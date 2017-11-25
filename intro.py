@@ -13,8 +13,8 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 
-#from sklearn import datasets
-#from sklearn.decomposition import PCA
+from sklearn import datasets
+from sklearn.decomposition import PCA
 
 import tensorflow.contrib.learn as tflearn
 import tensorflow.contrib.layers as tflayers
@@ -144,13 +144,13 @@ def create_train_model(hidden_nodes, num_iters):
 
     # Run the training for 3 different network architectures: (4-5-3) (4-10-3) (4-20-3)
 
-
 # Plot the loss function over iterations
 num_hidden_nodes = [5, 10, 20]  
 loss_plot = {5: [], 10: [], 20: []}  
 weights1 = {5: None, 10: None, 20: None}  
 weights2 = {5: None, 10: None, 20: None}  
 num_iters = 2000
+
 
 plt.figure(figsize=(12,8))  
 for hidden_nodes in num_hidden_nodes:  
