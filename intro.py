@@ -120,12 +120,14 @@ def create_train_model(hidden_nodes, num_iters):
 
     # Define a loss function
     deltas = tf.square(y_est - y)
+    #print("deltas " + deltas)
     loss = tf.reduce_sum(deltas)
-
+    #print("loss " + loss)
     # Define a train operation to minimize the loss
     optimizer = tf.train.GradientDescentOptimizer(0.005)
+    #print("optimizer " + optimizer)
     train = optimizer.minimize(loss)
-
+    #print("train " + train)
     # Initialize variables and run session
     init = tf.global_variables_initializer()
     sess = tf.Session()
@@ -136,7 +138,9 @@ def create_train_model(hidden_nodes, num_iters):
         sess.run(train, feed_dict={X: Xtrain, y: ytrain})
         loss_plot[hidden_nodes].append(sess.run(loss, feed_dict={X: Xtrain.as_matrix(), y: ytrain.as_matrix()}))
         weights1 = sess.run(W1)
+        #print(weights1)
         weights2 = sess.run(W2)
+        #print(weights2)
 
     print("loss (hidden nodes: %d, iterations: %d): %.2f" % (hidden_nodes, num_iters, loss_plot[hidden_nodes][-1]))
     sess.close()
@@ -144,11 +148,14 @@ def create_train_model(hidden_nodes, num_iters):
 
     # Run the training for 3 different network architectures: (4-5-3) (4-10-3) (4-20-3)
 
+##loss_plot = {5: []} #, 10: [], 20: []} 
+##create_train_model(5, 300)
+
 # Plot the loss function over iterations
-num_hidden_nodes = [5, 10, 20]  
-loss_plot = {5: [], 10: [], 20: []}  
-weights1 = {5: None, 10: None, 20: None}  
-weights2 = {5: None, 10: None, 20: None}  
+num_hidden_nodes = [5] #, 10, 20]  
+loss_plot = {5: []} #, 10: [], 20: []}  
+weights1 = {5: None} #, 10: None, 20: None}  
+weights2 = {5: None} #, 10: None, 20: None}  
 num_iters = 2000
 
 
@@ -186,8 +193,4 @@ for hidden_nodes in num_hidden_nodes:
                for estimate, target in zip(y_est_np, ytest.as_matrix())]
     accuracy = 100 * sum(correct) / len(correct)
     print('Network architecture 4-%d-3, accuracy: %.2f%%' % (hidden_nodes, accuracy))
-
-
-
-
 

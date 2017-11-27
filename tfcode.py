@@ -126,6 +126,7 @@ with tf.Session() as sess:
 print("-=====================================================")
 print(Y_test)
 print(y_pred - Y_test)
+'''
 
 
 print("============ Application ===============================")
@@ -139,6 +140,7 @@ X = np.array(d1)
 X = X[len(X)-500:,1]
 print(X.shape)
 
+
 def to_supervised(data, lag):
     df = pd.DataFrame(data)
     columns = [df.shift(lag + 1 -i) for i in range(1, lag+1)]
@@ -150,14 +152,17 @@ def to_supervised(data, lag):
 df = to_supervised(X, lag)
 df = np.array(df)
 print(df.shape)
+
 n1 = len(df) - forward
 train, test = df[:n1,:], df[n1:,:]
 X_train, y_train = train[:,:-1], train[:,-1]
 print(X_train.shape)
-
+print(y_train.shape)
 x_batches = X_train.reshape(-1,batch_size, lag)
-
+print("x_batches " , x_batches.shape)
 y_batches = y_train.reshape(-1, batch_size,1)
+print("y_batches ", y_batches.shape)
+
 testX, y_test = test[:,:-1], test[:,-1]
 print(testX.shape)
 print(y_test.shape)
@@ -214,7 +219,9 @@ with tf.Session() as sess:
             print(ep,"\tMSE",mse)
      y1_pred = sess.run(outputs, feed_dict = {x:testX2})
      #y2_pred.append(sess.run(outputs, feed_dict = {x:X_test[0,:,:]}))
+     print("+++++++++++++++++++++++++++++")
      print(y1_pred)
+
 
 print("==================================")
 y_test = y_test.reshape(len(y_test),1)
@@ -223,7 +230,10 @@ y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
 #print(y1_pred - y_test)
 
 
+
+
 ################# PART 1 ###########################################
+'''
 print("================== PART 1 ===================================")
 
 num_epochs = 3
@@ -359,6 +369,7 @@ plt.show()
 '''
 
 ##################### PART2 ########################################
+'''
 print("================= PART 2 - Application ===================================")
 d1 = pd.read_csv('ENDEX2.csv')
 
@@ -436,6 +447,7 @@ for current_input in inputs_series:
     states_series.append(next_state)
     current_state = next_state
 
+'''
 
 '''
 print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -472,6 +484,7 @@ print(current_state)
 '''
 
 
+'''
 logits_series = [tf.matmul(state, W2) + b2 for state in states_series] #Broadcasted addition
 print(logits_series)
 
@@ -566,4 +579,4 @@ plt.ioff()
 plt.show()
 print(y1_pred)
 
-
+'''
