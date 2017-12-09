@@ -158,6 +158,7 @@ train, test = df[:n1,:], df[n1:,:]
 X_train, y_train = train[:,:-1], train[:,-1]
 print(X_train.shape)
 print(y_train.shape)
+
 x_batches = X_train.reshape(-1,batch_size, lag)
 print("x_batches " , x_batches.shape)
 y_batches = y_train.reshape(-1, batch_size,1)
@@ -169,10 +170,11 @@ print(y_test.shape)
 testX2 = np.ones((lag,lag),dtype = float)
 testX2[:future,:]= testX
 testX2 = testX2.reshape(-1,lag,lag)
+print(testX2.shape)
 
-X_test = np.ones((forward+future-3, lag),dtype = float)
+X_test = np.ones((forward+future, lag),dtype = float)
 X_test[0,:] = df[(n1-1),1:]
-X_test = X_test.reshape(-1, forward+future-3,lag)
+X_test = X_test.reshape(-1, forward+future,lag)
 #X_test[0,:,:] = df[(n1-1),1:]
 print(X_test.shape)
 
@@ -207,7 +209,7 @@ training_op = optimizer.minimize(loss)
 
 init = tf.global_variables_initializer()
 
-epochs = 200
+epochs = 500
 y2_pred = list()
 
 with tf.Session() as sess:
@@ -219,6 +221,7 @@ with tf.Session() as sess:
             print(ep,"\tMSE",mse)
      y1_pred = sess.run(outputs, feed_dict = {x:testX2})
      #y2_pred.append(sess.run(outputs, feed_dict = {x:X_test[0,:,:]}))
+     #y1_pred = sess.run(outputs, feed_dict = {x:testX2[0,:,:]})
      print("+++++++++++++++++++++++++++++")
      print(y1_pred)
 
@@ -227,7 +230,7 @@ print("==================================")
 y_test = y_test.reshape(len(y_test),1)
 print(y_test)
 y1_pred = y1_pred.reshape(y1_pred.shape[1],1)
-#print(y1_pred - y_test)
+print(y1_pred) # - y_test)
 
 
 
