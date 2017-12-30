@@ -15,6 +15,8 @@ from random import random, randint
 
 t = datetime.datetime.time(datetime.datetime.now())
 
+'''
+
 data = pd.read_csv("housing.csv", delim_whitespace = True, header = None)
 data1 = pd.read_csv('ENDEX2.csv')
 #data2 = pd.read_csv('ESIVI.csv')
@@ -325,9 +327,12 @@ print(y_test)
 print(t)
 print(datetime.datetime.time(datetime.datetime.now()))
 
+'''
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'''
+
+#https://machinelearningmastery.com/object-recognition-convolutional-neural-networks-keras-deep-learning-library/
+
 from keras.datasets import cifar10
 from keras.models import Sequential
 from keras.layers import Dense
@@ -345,6 +350,19 @@ K.set_image_dim_ordering('th')
 seed = 7
 np.random.seed(seed)
 
+# load data
+(X_train, y_train), (X_test, y_test) = cifar10.load_data()
+
+# normalize inputs from 0-255 to 0.0-1.0
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+# one hot encode outputs
+y_train = np_utils.to_categorical(y_train)
+y_test = np_utils.to_categorical(y_test)
+num_classes = y_test.shape[1]
 
 
 # Create the model
@@ -369,20 +387,23 @@ model.add(Dense(512, activation='relu', kernel_constraint=maxnorm(3)))
 model.add(Dropout(0.2))
 model.add(Dense(1, activation='softmax'))
 # Compile model
-epochs = 25
+
+epochs = 5
 lrate = 0.01
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 print(model.summary())
 
+'''
 X_train = train[:,0:-1]
 y_train = train[:,-1]
 X_train = X_train.reshape(X_train.shape[0],X_train.shape[1],1)
+'''
 
 model.fit(X_train, y_train, validation_data=(testX, y_test), epochs=epochs, batch_size=64)
 # Final evaluation of the model
 scores = model.evaluate(testX, y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
-'''
+
