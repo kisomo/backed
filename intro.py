@@ -239,17 +239,29 @@ def create_train_model(hidden_nodes, num_iters):
 
     # Variables for two group of weights between the three layers of the network
     W1 = tf.Variable(np.random.rand(4, hidden_nodes), dtype=tf.float64)
+    #b1 = tf.Variable(tf.random_normal([hidden_nodes]), dtype=tf.float64)
+    b1 = tf.Variable(np.random.rand(hidden_nodes), dtype=tf.float64)
     W2 = tf.Variable(np.random.rand(hidden_nodes, hidden_nodes), dtype=tf.float64)
-    W3 = tf.Variable(np.random.rand(hidden_nodes, 120), dtype=tf.float64)
-    W4 = tf.Variable(np.random.rand(120, hidden_nodes), dtype=tf.float64)
+    b2 = tf.Variable(np.random.rand(hidden_nodes), dtype=tf.float64)
+    W3 = tf.Variable(np.random.rand(hidden_nodes, hidden_nodes), dtype=tf.float64)
+    b3 = tf.Variable(np.random.rand(hidden_nodes), dtype=tf.float64)
+    W4 = tf.Variable(np.random.rand(hidden_nodes, hidden_nodes), dtype=tf.float64)
+    b4 = tf.Variable(np.random.rand(hidden_nodes), dtype=tf.float64)
     W5 = tf.Variable(np.random.rand(hidden_nodes, 3), dtype=tf.float64)
+    b5 = tf.Variable(np.random.rand(3), dtype=tf.float64)
 
     # Create the neural net graph
-    A1 = tf.sigmoid(tf.matmul(X, W1))
-    A2 = tf.sigmoid(tf.matmul(A1, W2))
-    A3 = tf.sigmoid(tf.matmul(A2, W3))
-    A4 = tf.sigmoid(tf.matmul(A3, W4))
-    y_est = tf.sigmoid(tf.matmul(A4, W5))
+    #A1 = tf.sigmoid(tf.matmul(X,W1))
+    #A1 = tf.nn.relu( tf.add(tf.matmul(X, W1), b1))
+    A1 = tf.sigmoid( tf.add(tf.matmul(X, W1), b1))
+    #A2 = tf.sigmoid(tf.matmul(A1, W2))
+    A2 = tf.sigmoid( tf.add(tf.matmul(A1, W2), b2))
+    #A3 = tf.sigmoid(tf.matmul(A2, W3))
+    A3 = tf.sigmoid( tf.add(tf.matmul(A2, W3), b3))
+    #A4 = tf.sigmoid(tf.matmul(A3, W4))
+    A4 = tf.sigmoid( tf.add(tf.matmul(A3, W4), b4))
+    #y_est = tf.sigmoid(tf.matmul(A4, W5))
+    y_est = tf.sigmoid( tf.add(tf.matmul(A4, W5), b5))
 
     # Define a loss function
     deltas = tf.square(y_est - y)
@@ -272,43 +284,47 @@ def create_train_model(hidden_nodes, num_iters):
         #loss_plot[hidden_nodes].append(sess.run(loss, feed_dict={X: Xtrain.as_matrix(), y: ytrain.as_matrix()}))
         loss_plot.append(sess.run(loss, feed_dict={X: Xtrain.as_matrix(), y: ytrain.as_matrix()}))
         weights1 = sess.run(W1)
+        bias1    = sess.run(b1)
         weights2 = sess.run(W2)
+        bias2    = sess.run(b2)
         weights3 = sess.run(W3)
+        bias3    = sess.run(b3)
         weights4 = sess.run(W4)
-        #print(weights1)
+        bias4    = sess.run(b4)
         weights5 = sess.run(W5)
-        #print(weights2)
-
-    #print("loss (hidden nodes: %d, iterations: %d): %.2f" % (hidden_nodes, num_iters, loss_plot[hidden_nodes][-1]))
+        bias5    = sess.run(b5)
+    
     print("loss (hidden nodes: %d, iterations: %d): %.2f" % (hidden_nodes, num_iters, loss_plot[-1]))
     #print(loss_plot)
     sess.close()
-    return weights1, weights2, weights3, weights4, weights5
+    return weights1, bias1, weights2, bias2, weights3, bias3, weights4, bias4, weights5, bias5
 
-    # Run the training for 3 different network architectures: (4-5-3) (4-10-3) (4-20-3)
+
 
 #loss_plot = []  #{5: [], 10: [], 20: []} 
-#create_train_model(100, 2000)
-#create_train_model(100, 2500)
-#create_train_model(200, 3000)
+#create_train_model(10, 200)
+#create_train_model(100, 200)
+#create_train_model(200, 300)
 
 
 # Plot the loss function over iterations
-num_hidden_nodes = 100 #[5, 10, 20]  
+#num_hidden_nodes = 10 #[5, 10, 20]  
 loss_plot = [] #{5: [], 10: [], 20: []}  
-weights1 = [] #{5: None, 10: None, 20: None}  
-weights2 = [] #{5: None, 10: None, 20: None}  
+weights1 = [] #{5: None, 10: None, 20: None} 
+bias1 = [] 
+weights2 = [] #{5: None, 10: None, 20: None} 
+bias2 = []  
 weights3 = [] #{5: None, 10: None, 20: None} 
+bias3 = [] 
 weights4 = [] #{5: None, 10: None, 20: None} 
+bias4 = [] 
 weights5 = [] #{5: None, 10: None, 20: None} 
-num_iters = 3000
+bias5 = [] 
+num_iters = 500
 
-
-#plt.figure(figsize=(12,8))  
-#for hidden_nodes in num_hidden_nodes:
-hidden_nodes = 100
-weights1, weights2, weights3, weights4, weights5 = create_train_model(hidden_nodes, num_iters)
-plt.plot(range(num_iters), loss_plot, label="nn: 4-%d-%d-120-%d-3?" % (hidden_nodes,  hidden_nodes, hidden_nodes))
+hidden_nodes = 20
+weights1, bias1, weights2, bias2, weights3, bias3, weights4, bias4, weights5, bias5 = create_train_model(hidden_nodes, num_iters)
+plt.plot(range(num_iters), loss_plot, label="nn: 4-%d-%d-%d-%d-3?" % (hidden_nodes,  hidden_nodes, hidden_nodes, hidden_nodes))
 
 plt.xlabel('Iteration', fontsize=12)  
 plt.ylabel('Loss', fontsize=12)  
@@ -324,16 +340,29 @@ y = tf.placeholder(shape=(30, 3), dtype=tf.float64, name='y')
 
     # Forward propagation
 W1 = tf.Variable(weights1)
+b1 = tf.Variable(bias1)
 W2 = tf.Variable(weights2)
+b2 = tf.Variable(bias2)
 W3 = tf.Variable(weights3)
+b3 = tf.Variable(bias3)
 W4 = tf.Variable(weights4)
+b4 = tf.Variable(bias4)
 W5 = tf.Variable(weights5)
-A1 = tf.sigmoid(tf.matmul(X, W1))
-A2 = tf.sigmoid(tf.matmul(A1, W2))
-A3 = tf.sigmoid(tf.matmul(A2, W3))
-A4 = tf.sigmoid(tf.matmul(A3, W4))
-y_est = tf.sigmoid(tf.matmul(A4, W5))
+b5 = tf.Variable(bias5)
+
+#A1 = tf.sigmoid(tf.matmul(X, W1))
+#A1 = tf.nn.relu( tf.add(tf.matmul(X, W1), b1))
+A1 = tf.sigmoid( tf.add(tf.matmul(X, W1), b1))
+#A2 = tf.sigmoid(tf.matmul(A1, W2))
+A2 = tf.sigmoid( tf.add(tf.matmul(A1, W2), b2))
+#A3 = tf.sigmoid(tf.matmul(A2, W3))
+A3 = tf.sigmoid( tf.add(tf.matmul(A2, W3), b3))
+#A4 = tf.sigmoid(tf.matmul(A3, W4))
+A4 = tf.sigmoid( tf.add(tf.matmul(A3, W4), b4))
+#y_est = tf.sigmoid(tf.matmul(A4, W5))
+y_est = tf.sigmoid( tf.add(tf.matmul(A4, W5), b5))
 print(y_est)
+
 
     # Calculate the predicted outputs
 init = tf.global_variables_initializer()
@@ -342,6 +371,7 @@ with tf.Session() as sess:
     y_est_np = sess.run(y_est, feed_dict={X: Xtest}) #, y: ytest})
 
 print(y_est_np - ytest)
+#print(ytest.as_matrix())
 
 
     # Calculate the prediction accuracy
@@ -351,6 +381,6 @@ accuracy = 100 * sum(correct) / len(correct)
 print(len(correct))
 print(sum(correct))
 print("accuracy = %.2f%%" %accuracy)
-#print(correct)
+print(correct)
 ##print('Network architecture 4-%d-3, accuracy: %.2f%%' % (hidden_nodes, accuracy))
-print("Network architecture = 4-%d-%d-120-%d-3, accuracy = %.2f%%" % (hidden_nodes,  hidden_nodes, hidden_nodes,accuracy))
+print("Network architecture = 4-%d-%d-%d-%d-3, accuracy = %.2f%%" % (hidden_nodes,  hidden_nodes, hidden_nodes, hidden_nodes,accuracy))
